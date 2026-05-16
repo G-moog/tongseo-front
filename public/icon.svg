@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#111118"/>
+  <rect width="512" height="512" rx="112" fill="url(#grad)"/>
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1c1c27"/>
+      <stop offset="100%" style="stop-color:#111118"/>
+    </linearGradient>
+  </defs>
+  <!-- 노트 아이콘 -->
+  <rect x="148" y="120" width="216" height="272" rx="20" fill="#1e1e2e" stroke="#7c3aed" stroke-width="6"/>
+  <!-- 줄 -->
+  <line x1="184" y1="196" x2="328" y2="196" stroke="#7c3aed" stroke-width="10" stroke-linecap="round" opacity="0.9"/>
+  <line x1="184" y1="240" x2="300" y2="240" stroke="#7c3aed" stroke-width="10" stroke-linecap="round" opacity="0.6"/>
+  <line x1="184" y1="284" x2="316" y2="284" stroke="#7c3aed" stroke-width="10" stroke-linecap="round" opacity="0.6"/>
+  <line x1="184" y1="328" x2="272" y2="328" stroke="#7c3aed" stroke-width="10" stroke-linecap="round" opacity="0.4"/>
+  <!-- 연필 -->
+  <g transform="translate(292, 300) rotate(-35)">
+    <rect x="-14" y="-60" width="28" height="90" rx="4" fill="#a78bfa"/>
+    <polygon points="-14,30 14,30 0,58" fill="#c4b5fd"/>
+    <rect x="-14" y="-72" width="28" height="16" rx="3" fill="#6d28d9"/>
+  </g>
+</svg>
