@@ -65,8 +65,6 @@ function NoteCard({
           </button>
         </div>
       </div>
-      {note.title && <p className="font-semibold text-gray-100 text-xs">{note.title}</p>}
-      {note.summary && <p className="text-[11px] text-gray-500 leading-snug">{note.summary}</p>}
       <p className="text-xs text-gray-400 leading-relaxed line-clamp-2">{note.content}</p>
     </div>
   )
