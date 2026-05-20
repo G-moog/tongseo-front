@@ -1,8 +1,21 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import SideDrawer from '../components/SideDrawer'
-import type { Category } from '../types'
+import type { Category, Note } from '../types'
+
+function formatTime(iso: string) {
+  const d = new Date(iso)
+  const now = new Date()
+  const diffMs = now.getTime() - d.getTime()
+  const diffMin = Math.floor(diffMs / 60000)
+  if (diffMin < 1) return '방금'
+  if (diffMin < 60) return `${diffMin}분 전`
+  const diffH = Math.floor(diffMin / 60)
+  if (diffH < 24) return `${diffH}시간 전`
+  return `${d.getMonth() + 1}/${d.getDate()}`
+}
 
 interface ClassifyResult {
   category: string
@@ -14,12 +27,14 @@ interface ClassifyResult {
 type Step = 'write' | 'confirm_remind' | 'pick_remind'
 
 export default function HomePage() {
+  const navigate = useNavigate()
   const { user, profile } = useAuth()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const categoryPickerRef = useRef<HTMLDivElement>(null)
 
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
+  const [recentNotes, setRecentNotes] = useState<Note[]>([])
   const [content, setContent] = useState('')
   const [isManual, setIsManual] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('')
@@ -35,6 +50,18 @@ export default function HomePage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
+  const fetchRecent = async () => {
+    if (!user) return
+    const { data } = await supabase
+      .from('notes')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('is_deleted', false)
+      .order('created_at', { ascending: false })
+      .limit(5)
+    setRecentNotes(data ?? [])
+  }
+
   useEffect(() => {
     if (!user) return
     supabase
@@ -47,6 +74,7 @@ export default function HomePage() {
         const defaultCat = profile?.default_manual_category ?? data?.[0]?.name ?? ''
         setSelectedCategory(defaultCat)
       })
+    fetchRecent()
   }, [user])
 
   // 카테고리 피커 외부 클릭 시 닫기
@@ -100,6 +128,7 @@ export default function HomePage() {
         textareaRef.current.focus()
       }
       showSuccess(isManual ? '메모가 저장됐습니다 ✓' : `[${result?.category}] 로 분류됐습니다 ✓`)
+      fetchRecent()
     } catch {
       setError('저장에 실패했습니다. 다시 시도해주세요.')
     } finally {
@@ -230,12 +259,47 @@ export default function HomePage() {
           <span className="w-5 h-0.5 bg-gray-400 rounded-full" />
         </button>
         <span className="text-gray-500 text-sm font-medium">통서</span>
-        <div className="w-9" /> {/* 우측 여백 균형 */}
+        <div className="w-9" />
       </header>
 
       {/* 입력 영역 */}
-      <main className="flex-1 flex flex-col px-4 pb-4">
-        <div className="flex-1 flex flex-col justify-end gap-3">
+      <main className="flex-1 flex flex-col px-4 pb-4 overflow-hidden">
+
+        {/* 최근 메모 피드 */}
+        <div className="flex-1 overflow-y-auto flex flex-col justify-end gap-1.5 pb-3 min-h-0">
+          {recentNotes.length === 0 ? (
+            <p className="text-center text-gray-700 text-xs pb-4">첫 메모를 작성해보세요</p>
+          ) : recentNotes.map(note => {
+            const cat = categories.find(c => c.name === (note.is_manual ? note.manual_category : note.category))
+            return (
+              <button
+                key={note.id}
+                onClick={() => navigate('/edit', { state: { note } })}
+                className="w-full text-left bg-[#1c1c27] border border-[#2e2e42] rounded-xl px-3 py-2 flex flex-col gap-0.5 hover:border-[#3e3e55] transition-colors"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    {cat && (
+                      <span
+                        className="shrink-0 px-1.5 py-0.5 rounded-full text-[10px] font-medium text-white"
+                        style={{ backgroundColor: cat.color ?? '#7c3aed' }}
+                      >
+                        {cat.emoji} {cat.name}
+                      </span>
+                    )}
+                    {note.title && (
+                      <span className="text-xs text-gray-300 font-medium truncate">{note.title}</span>
+                    )}
+                  </div>
+                  <span className="shrink-0 text-[10px] text-gray-600">{formatTime(note.created_at)}</span>
+                </div>
+                <p className="text-xs text-gray-500 leading-relaxed line-clamp-1">{note.content}</p>
+              </button>
+            )
+          })}
+        </div>
+
+        <div className="flex flex-col gap-3">
 
           {/* 성공 메시지 */}
           {success && (

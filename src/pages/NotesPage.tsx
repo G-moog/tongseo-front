@@ -37,37 +37,37 @@ function NoteCard({
   const cat = categories.find(c => c.name === (note.is_manual ? note.manual_category : note.category))
 
   return (
-    <div className="bg-[#1c1c27] rounded-2xl border border-[#2e2e42] p-4 flex flex-col gap-2">
+    <div className="bg-[#1c1c27] rounded-xl border border-[#2e2e42] px-3 py-2 flex flex-col gap-1">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {cat && (
             <span
-              className="px-2 py-0.5 rounded-full text-[11px] font-medium text-white"
+              className="px-1.5 py-0.5 rounded-full text-[10px] font-medium text-white"
               style={{ backgroundColor: cat.color ?? '#7c3aed' }}
             >
               {cat.emoji} {cat.name}
             </span>
           )}
-          <span className="text-[11px] text-gray-600">{formatTime(note.created_at)}</span>
+          <span className="text-[10px] text-gray-600">{formatTime(note.created_at)}</span>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
           <button
             onClick={() => onEdit(note)}
-            className="p-1.5 text-gray-600 hover:text-violet-400 transition-colors"
+            className="p-1 text-gray-600 hover:text-violet-400 transition-colors text-xs"
           >
             ✏️
           </button>
           <button
             onClick={() => onDelete(note.id)}
-            className="p-1.5 text-gray-600 hover:text-red-400 transition-colors"
+            className="p-1 text-gray-600 hover:text-red-400 transition-colors text-xs"
           >
             🗑️
           </button>
         </div>
       </div>
-      {note.title && <p className="font-semibold text-gray-100 text-sm">{note.title}</p>}
-      {note.summary && <p className="text-xs text-gray-500">{note.summary}</p>}
-      <p className="text-sm text-gray-400 leading-relaxed line-clamp-3">{note.content}</p>
+      {note.title && <p className="font-semibold text-gray-100 text-xs">{note.title}</p>}
+      {note.summary && <p className="text-[11px] text-gray-500 leading-snug">{note.summary}</p>}
+      <p className="text-xs text-gray-400 leading-relaxed line-clamp-2">{note.content}</p>
     </div>
   )
 }
