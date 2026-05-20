@@ -200,7 +200,7 @@ export default function NotesPage() {
         </div>
       </header>
 
-      <main className="flex-1 px-4 pt-4 pb-8">
+      <main className="flex-1 px-4 pt-4 pb-24">
         {loading ? (
           <div className="flex justify-center pt-16">
             <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
@@ -273,6 +273,17 @@ export default function NotesPage() {
           </div>
         )}
       </main>
+
+      {/* 하단 작성하기 버튼 */}
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] px-4 pb-4 bg-gradient-to-t from-[#111118] via-[#111118]/90 to-transparent pt-6">
+        <button
+          onClick={() => navigate('/')}
+          className="w-full bg-[#1c1c27] border border-[#2e2e42] rounded-xl px-3 py-2.5 flex items-center justify-center gap-2 hover:border-violet-500/50 hover:bg-[#22223a] transition-colors"
+        >
+          <span className="text-violet-400 text-sm">✏️</span>
+          <span className="text-sm font-medium text-gray-300">새 메모 작성하기</span>
+        </button>
+      </div>
 
     </div>
   )
