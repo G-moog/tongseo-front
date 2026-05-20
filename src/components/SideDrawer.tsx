@@ -46,11 +46,11 @@ export default function SideDrawer({ open, onClose }: Props) {
         {/* 네비게이션 */}
         <nav className="flex-1 px-3 py-4 flex flex-col gap-1">
           <button
-            onClick={() => go('/mypage')}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-300 hover:bg-[#252535] hover:text-white transition-colors text-sm"
+            onClick={() => go('/')}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-violet-600/20 border border-violet-500/30 text-violet-300 hover:bg-violet-600/30 transition-colors text-sm font-medium"
           >
-            <span className="text-base">👤</span>
-            마이페이지
+            <span className="text-base">✏️</span>
+            작성하기
           </button>
 
           <div className="my-2 border-t border-[#2e2e42]" />
@@ -74,6 +74,14 @@ export default function SideDrawer({ open, onClose }: Props) {
           </button>
 
           <div className="my-2 border-t border-[#2e2e42]" />
+
+          <button
+            onClick={() => go('/mypage')}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-300 hover:bg-[#252535] hover:text-white transition-colors text-sm"
+          >
+            <span className="text-base">👤</span>
+            마이페이지
+          </button>
 
           <button
             onClick={() => go('/settings')}

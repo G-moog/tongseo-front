@@ -170,9 +170,7 @@ export default function NotesPage() {
               <span className="w-5 h-0.5 bg-gray-400 rounded-full" />
             </button>
             <h1 className="text-base font-semibold text-white">메모 목록</h1>
-            <button onClick={() => navigate('/')} className="text-violet-400 text-sm font-medium hover:text-violet-300 transition-colors">
-              + 작성
-            </button>
+            <div className="w-9" />
           </div>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600">🔍</span>
