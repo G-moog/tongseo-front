@@ -275,13 +275,12 @@ export default function NotesPage() {
       </main>
 
       {/* 하단 작성하기 버튼 */}
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] px-4 pb-4 bg-gradient-to-t from-[#111118] via-[#111118]/90 to-transparent pt-6">
+      <div className="fixed bottom-[0.5em] left-1/2 -translate-x-1/2 w-full max-w-[440px] px-4">
         <button
           onClick={() => navigate('/')}
-          className="w-full bg-[#1c1c27] border border-[#2e2e42] rounded-xl px-3 py-2.5 flex items-center justify-center gap-2 hover:border-violet-500/50 hover:bg-[#22223a] transition-colors"
+          className="w-full bg-violet-600 hover:bg-violet-500 active:bg-violet-700 rounded-xl py-2.5 flex items-center justify-center transition-colors"
         >
-          <span className="text-violet-400 text-sm">✏️</span>
-          <span className="text-sm font-medium text-gray-300">새 메모 작성하기</span>
+          <span className="text-base font-semibold text-white tracking-[0.4em]">작성하기</span>
         </button>
       </div>
 
