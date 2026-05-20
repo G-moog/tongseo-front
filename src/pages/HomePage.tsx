@@ -262,44 +262,36 @@ export default function HomePage() {
         <div className="w-9" />
       </header>
 
+      {/* 최근 메모 피드 */}
+      <div className="px-4 pt-2 pb-1 flex flex-col gap-1.5">
+        {recentNotes.length === 0 ? (
+          <p className="text-center text-gray-700 text-xs py-3">첫 메모를 작성해보세요</p>
+        ) : recentNotes.map(note => {
+          const cat = categories.find(c => c.name === (note.is_manual ? note.manual_category : note.category))
+          return (
+            <button
+              key={note.id}
+              onClick={() => navigate('/edit', { state: { note } })}
+              className="w-full text-left bg-[#1c1c27] border border-[#2e2e42] rounded-xl px-3 py-2 flex items-center gap-2 hover:border-[#3e3e55] transition-colors"
+            >
+              {cat && (
+                <span
+                  className="shrink-0 px-1.5 py-0.5 rounded-full text-[10px] font-medium text-white"
+                  style={{ backgroundColor: cat.color ?? '#7c3aed' }}
+                >
+                  {cat.emoji} {cat.name}
+                </span>
+              )}
+              <p className="flex-1 text-xs text-gray-400 truncate">{note.content}</p>
+              <span className="shrink-0 text-[10px] text-gray-600">{formatTime(note.created_at)}</span>
+            </button>
+          )
+        })}
+      </div>
+
       {/* 입력 영역 */}
-      <main className="flex-1 flex flex-col px-4 pb-4 overflow-hidden">
-
-        {/* 최근 메모 피드 */}
-        <div className="flex-1 overflow-y-auto flex flex-col justify-end gap-1.5 pb-3 min-h-0">
-          {recentNotes.length === 0 ? (
-            <p className="text-center text-gray-700 text-xs pb-4">첫 메모를 작성해보세요</p>
-          ) : recentNotes.map(note => {
-            const cat = categories.find(c => c.name === (note.is_manual ? note.manual_category : note.category))
-            return (
-              <button
-                key={note.id}
-                onClick={() => navigate('/edit', { state: { note } })}
-                className="w-full text-left bg-[#1c1c27] border border-[#2e2e42] rounded-xl px-3 py-2 flex flex-col gap-0.5 hover:border-[#3e3e55] transition-colors"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    {cat && (
-                      <span
-                        className="shrink-0 px-1.5 py-0.5 rounded-full text-[10px] font-medium text-white"
-                        style={{ backgroundColor: cat.color ?? '#7c3aed' }}
-                      >
-                        {cat.emoji} {cat.name}
-                      </span>
-                    )}
-                    {note.title && (
-                      <span className="text-xs text-gray-300 font-medium truncate">{note.title}</span>
-                    )}
-                  </div>
-                  <span className="shrink-0 text-[10px] text-gray-600">{formatTime(note.created_at)}</span>
-                </div>
-                <p className="text-xs text-gray-500 leading-relaxed line-clamp-1">{note.content}</p>
-              </button>
-            )
-          })}
-        </div>
-
-        <div className="flex flex-col gap-3">
+      <main className="flex-1 flex flex-col px-4 pb-4">
+        <div className="flex-1 flex flex-col justify-end gap-3">
 
           {/* 성공 메시지 */}
           {success && (
