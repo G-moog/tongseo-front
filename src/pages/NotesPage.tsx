@@ -66,6 +66,13 @@ function NoteCard({
         </div>
       </div>
       <p className="text-xs text-gray-400 leading-relaxed line-clamp-2">{note.content}</p>
+      {note.image_urls && note.image_urls.length > 0 && (
+        <div className="flex gap-1.5 overflow-x-auto pt-0.5">
+          {note.image_urls.map((url, i) => (
+            <img key={i} src={url} className="w-14 h-14 object-cover rounded-lg border border-[#2e2e42] shrink-0" />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

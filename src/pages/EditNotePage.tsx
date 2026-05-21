@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { uploadImages } from '../lib/uploadImages'
 import { useAuth } from '../contexts/AuthContext'
 import type { Category, Note } from '../types'
 
@@ -21,6 +22,7 @@ export default function EditNotePage() {
   const { user, profile } = useAuth()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const categoryPickerRef = useRef<HTMLDivElement>(null)
+  const imageInputRef = useRef<HTMLInputElement>(null)
 
   const [categories, setCategories] = useState<Category[]>([])
   const [content, setContent] = useState(note?.content ?? '')
@@ -30,6 +32,11 @@ export default function EditNotePage() {
   )
   const [showCategoryPicker, setShowCategoryPicker] = useState(false)
   const [remindEnabled, setRemindEnabled] = useState(false)
+  // 기존 이미지 URL (수정 시 유지)
+  const [existingUrls, setExistingUrls] = useState<string[]>(note?.image_urls ?? [])
+  // 새로 추가한 이미지
+  const [imageFiles, setImageFiles] = useState<File[]>([])
+  const [imagePreviews, setImagePreviews] = useState<string[]>([])
 
   const [step, setStep] = useState<Step>('write')
   const [classifyResult, setClassifyResult] = useState<ClassifyResult | null>(null)
@@ -72,14 +79,37 @@ export default function EditNotePage() {
     el.style.height = el.scrollHeight + 'px'
   }
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? [])
+    if (files.length === 0) return
+    setImageFiles(prev => [...prev, ...files])
+    setImagePreviews(prev => [...prev, ...files.map(f => URL.createObjectURL(f))])
+    e.target.value = ''
+  }
+
+  const removeExisting = (idx: number) => {
+    setExistingUrls(prev => prev.filter((_, i) => i !== idx))
+  }
+
+  const removeNew = (idx: number) => {
+    URL.revokeObjectURL(imagePreviews[idx])
+    setImageFiles(prev => prev.filter((_, i) => i !== idx))
+    setImagePreviews(prev => prev.filter((_, i) => i !== idx))
+  }
+
   const saveNote = async (result: ClassifyResult | null, remindAt: string | null) => {
     if (!user || !note) return
     setLoading(true)
     setError('')
     try {
+      const newUrls = imageFiles.length > 0
+        ? await uploadImages(user.id, imageFiles)
+        : []
+      const image_urls = [...existingUrls, ...newUrls]
+
       const payload = isManual
-        ? { content, is_manual: true, manual_category: selectedCategory, category: selectedCategory, title: null, summary: null }
-        : { content, is_manual: false, category: result?.category ?? null, title: result?.title ?? null, summary: result?.summary ?? null, remind_at: remindAt }
+        ? { content, is_manual: true, manual_category: selectedCategory, category: selectedCategory, title: null, summary: null, image_urls }
+        : { content, is_manual: false, category: result?.category ?? null, title: result?.title ?? null, summary: result?.summary ?? null, remind_at: remindAt, image_urls }
 
       const { error } = await supabase.from('notes')
         .update({ ...payload, updated_at: new Date().toISOString() })
@@ -218,6 +248,9 @@ export default function EditNotePage() {
             </button>
           </div>
 
+          {/* 이미지 input (숨김) */}
+          <input ref={imageInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleImageSelect} />
+
           {/* 입력 박스 */}
           <div ref={categoryPickerRef} className="bg-[#1c1c27] border border-[#2e2e42] rounded-2xl overflow-hidden focus-within:border-[#4a4a60] transition-colors">
             <textarea
@@ -230,11 +263,43 @@ export default function EditNotePage() {
               className="w-full px-4 pt-4 pb-2 bg-transparent text-gray-100 text-base leading-relaxed placeholder-gray-600 focus:outline-none resize-none"
             />
 
+            {/* 이미지 미리보기 (기존 + 신규) */}
+            {(existingUrls.length > 0 || imagePreviews.length > 0) && (
+              <div className="flex gap-2 px-3 pb-2 overflow-x-auto">
+                {existingUrls.map((url, i) => (
+                  <div key={`ex-${i}`} className="relative shrink-0">
+                    <img src={url} className="w-16 h-16 object-cover rounded-lg border border-[#3a3a50]" />
+                    <button onClick={() => removeExisting(i)}
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#111118] border border-[#3a3a50] rounded-full text-gray-400 hover:text-red-400 flex items-center justify-center text-[10px]">
+                      ✕
+                    </button>
+                  </div>
+                ))}
+                {imagePreviews.map((src, i) => (
+                  <div key={`new-${i}`} className="relative shrink-0">
+                    <img src={src} className="w-16 h-16 object-cover rounded-lg border border-violet-500/40" />
+                    <button onClick={() => removeNew(i)}
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#111118] border border-[#3a3a50] rounded-full text-gray-400 hover:text-red-400 flex items-center justify-center text-[10px]">
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {error && <p className="px-4 pb-2 text-sm text-red-400">{error}</p>}
 
             {/* 옵션 행 */}
             <div className="flex items-center justify-between px-3 pb-3 pt-1 gap-2">
               <div className="flex items-center gap-2 flex-wrap">
+                {/* 이미지 첨부 버튼 */}
+                <button onClick={() => imageInputRef.current?.click()}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#252535] border border-[#3a3a50] text-gray-400 text-xs font-medium hover:text-gray-200 hover:bg-[#2e2e42] transition-colors">
+                  <span>🖼️</span>
+                  {(existingUrls.length + imagePreviews.length) > 0 && (
+                    <span className="text-violet-400">{existingUrls.length + imagePreviews.length}</span>
+                  )}
+                </button>
                 {!isManual ? (
                   <button onClick={() => setIsManual(true)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-600/20 border border-violet-500/30 text-violet-300 text-xs font-medium hover:bg-violet-600/30 transition-colors">

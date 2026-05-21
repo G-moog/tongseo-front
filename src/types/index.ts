@@ -31,6 +31,7 @@ export interface Note {
   remind_at: string | null
   is_deleted: boolean
   deleted_at: string | null
+  image_urls: string[] | null
   created_at: string
   updated_at: string
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { uploadImages } from '../lib/uploadImages'
 import { useAuth } from '../contexts/AuthContext'
 import SideDrawer from '../components/SideDrawer'
 import type { Category, Note } from '../types'
@@ -32,6 +33,8 @@ export default function HomePage() {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const categoryPickerRef = useRef<HTMLDivElement>(null)
 
+  const imageInputRef = useRef<HTMLInputElement>(null)
+
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [recentNotes, setRecentNotes] = useState<Note[]>([])
@@ -39,6 +42,8 @@ export default function HomePage() {
   const [isManual, setIsManual] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('')
   const [showCategoryPicker, setShowCategoryPicker] = useState(false)
+  const [imageFiles, setImageFiles] = useState<File[]>([])
+  const [imagePreviews, setImagePreviews] = useState<string[]>([])
 
   const [remindEnabled, setRemindEnabled] = useState(false)
 
@@ -106,14 +111,33 @@ export default function HomePage() {
     setTimeout(() => setSuccess(''), 2500)
   }
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? [])
+    if (files.length === 0) return
+    setImageFiles(prev => [...prev, ...files])
+    const previews = files.map(f => URL.createObjectURL(f))
+    setImagePreviews(prev => [...prev, ...previews])
+    e.target.value = ''
+  }
+
+  const removeImage = (idx: number) => {
+    URL.revokeObjectURL(imagePreviews[idx])
+    setImageFiles(prev => prev.filter((_, i) => i !== idx))
+    setImagePreviews(prev => prev.filter((_, i) => i !== idx))
+  }
+
   const saveNote = async (result: ClassifyResult | null, remindAt: string | null) => {
     if (!user) return
     setLoading(true)
     setError('')
     try {
+      const uploadedUrls = imageFiles.length > 0
+        ? await uploadImages(user.id, imageFiles)
+        : []
+
       const payload = isManual
-        ? { user_id: user.id, content, is_manual: true, manual_category: selectedCategory, category: selectedCategory }
-        : { user_id: user.id, content, is_manual: false, category: result?.category ?? null, title: result?.title ?? null, summary: result?.summary ?? null, remind_at: remindAt }
+        ? { user_id: user.id, content, is_manual: true, manual_category: selectedCategory, category: selectedCategory, image_urls: uploadedUrls }
+        : { user_id: user.id, content, is_manual: false, category: result?.category ?? null, title: result?.title ?? null, summary: result?.summary ?? null, remind_at: remindAt, image_urls: uploadedUrls }
 
       const { error } = await supabase.from('notes').insert(payload as never)
       if (error) throw error
@@ -123,6 +147,9 @@ export default function HomePage() {
       setStep('write')
       setClassifyResult(null)
       setManualRemind('')
+      imagePreviews.forEach(url => URL.revokeObjectURL(url))
+      setImageFiles([])
+      setImagePreviews([])
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto'
         textareaRef.current.focus()
@@ -305,6 +332,13 @@ export default function HomePage() {
                 </div>
               </div>
               <p className="text-xs text-gray-400 leading-relaxed line-clamp-2">{note.content}</p>
+              {note.image_urls && note.image_urls.length > 0 && (
+                <div className="flex gap-1.5 overflow-x-auto pt-0.5">
+                  {note.image_urls.map((url, i) => (
+                    <img key={i} src={url} className="w-14 h-14 object-cover rounded-lg border border-[#2e2e42] shrink-0" />
+                  ))}
+                </div>
+              )}
             </div>
           )
         })}
@@ -336,6 +370,16 @@ export default function HomePage() {
             </button>
           </div>
 
+          {/* 이미지 input (숨김) */}
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={handleImageSelect}
+          />
+
           {/* 텍스트 입력 박스 */}
           <div ref={categoryPickerRef} className="bg-[#1c1c27] border border-[#2e2e42] rounded-2xl overflow-hidden focus-within:border-[#4a4a60] transition-colors">
             <textarea
@@ -348,12 +392,37 @@ export default function HomePage() {
               className="w-full px-4 pt-4 pb-2 bg-transparent text-gray-100 text-base leading-relaxed placeholder-gray-600 focus:outline-none resize-none"
             />
 
+            {/* 이미지 미리보기 */}
+            {imagePreviews.length > 0 && (
+              <div className="flex gap-2 px-3 pb-2 overflow-x-auto">
+                {imagePreviews.map((src, idx) => (
+                  <div key={idx} className="relative shrink-0">
+                    <img src={src} className="w-16 h-16 object-cover rounded-lg border border-[#3a3a50]" />
+                    <button
+                      onClick={() => removeImage(idx)}
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#111118] border border-[#3a3a50] rounded-full text-gray-400 hover:text-red-400 flex items-center justify-center text-[10px]"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* 오류 메시지 */}
             {error && <p className="px-4 pb-2 text-sm text-red-400">{error}</p>}
 
             {/* 옵션 버튼 행 */}
             <div className="flex items-center justify-between px-3 pb-3 pt-1 gap-2">
               <div className="flex items-center gap-2 flex-wrap">
+                {/* 이미지 첨부 버튼 */}
+                <button
+                  onClick={() => imageInputRef.current?.click()}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#252535] border border-[#3a3a50] text-gray-400 text-xs font-medium hover:text-gray-200 hover:bg-[#2e2e42] transition-colors"
+                >
+                  <span>🖼️</span>
+                  {imagePreviews.length > 0 && <span className="text-violet-400">{imagePreviews.length}</span>}
+                </button>
                 {/* 자동분류 / 수동분류 토글 버튼 */}
                 {!isManual ? (
                   <button
