@@ -123,10 +123,12 @@ export default function EditNotePage() {
   }
 
   const handleSend = async () => {
-    if (!content.trim() || loading) return
+    const hasContent = content.trim().length > 0
+    const hasImages = existingUrls.length > 0 || imagePreviews.length > 0
+    if ((!hasContent && !hasImages) || loading) return
     setError('')
 
-    if (isManual) { await saveNote(null, null); return }
+    if (isManual || !hasContent) { await saveNote(null, null); return }
 
     setLoading(true)
     try {
@@ -226,7 +228,7 @@ export default function EditNotePage() {
           ← 취소
         </button>
         <span className="text-sm font-semibold text-gray-300">메모 수정</span>
-        <button onClick={handleSend} disabled={loading || !content.trim()}
+        <button onClick={handleSend} disabled={loading || (!content.trim() && existingUrls.length === 0 && imagePreviews.length === 0)}
           className="text-sm font-semibold text-violet-400 disabled:text-gray-700 transition-colors">
           {loading ? '처리 중...' : '저장'}
         </button>
@@ -319,7 +321,7 @@ export default function EditNotePage() {
                 )}
               </div>
 
-              <button onClick={handleSend} disabled={loading || !content.trim()}
+              <button onClick={handleSend} disabled={loading || (!content.trim() && existingUrls.length === 0 && imagePreviews.length === 0)}
                 className="w-8 h-8 rounded-lg bg-violet-600 hover:bg-violet-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center flex-shrink-0">
                 {loading
                   ? <span className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />

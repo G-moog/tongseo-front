@@ -164,10 +164,13 @@ export default function HomePage() {
   }
 
   const handleSend = async () => {
-    if (!content.trim() || loading) return
+    const hasContent = content.trim().length > 0
+    const hasImages = imageFiles.length > 0
+    if ((!hasContent && !hasImages) || loading) return
     setError('')
 
-    if (isManual) {
+    // 이미지만 있거나 수동분류면 AI 분류 없이 바로 저장
+    if (isManual || !hasContent) {
       await saveNote(null, null)
       return
     }
@@ -456,7 +459,7 @@ export default function HomePage() {
               {/* 전송 버튼 */}
               <button
                 onClick={handleSend}
-                disabled={loading || !content.trim()}
+                disabled={loading || (!content.trim() && imageFiles.length === 0)}
                 className="w-8 h-8 rounded-lg bg-violet-600 hover:bg-violet-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center flex-shrink-0"
               >
                 {loading
