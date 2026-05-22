@@ -288,7 +288,7 @@ export default function HomePage() {
           <span className="w-5 h-0.5 bg-gray-400 rounded-full" />
           <span className="w-5 h-0.5 bg-gray-400 rounded-full" />
         </button>
-        <span className="text-gray-500 text-sm font-medium">통서</span>
+        <span className="text-gray-500 text-sm font-medium">통서(通書)</span>
         <div className="w-9" />
       </header>
 

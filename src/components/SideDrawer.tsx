@@ -37,7 +37,7 @@ export default function SideDrawer({ open, onClose }: Props) {
           <div className="flex items-center gap-3">
             <span className="text-2xl">📝</span>
             <div>
-              <p className="font-bold text-white text-lg">통서</p>
+              <p className="font-bold text-white text-lg">통서(通書)</p>
               <p className="text-xs text-gray-500 truncate">{user?.email}</p>
             </div>
           </div>

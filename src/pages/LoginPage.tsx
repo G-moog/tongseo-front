@@ -8,7 +8,7 @@ export default function LoginPage() {
       <div className="w-full max-w-[440px] flex flex-col items-center gap-8">
         <div className="flex flex-col items-center gap-3">
           <span className="text-5xl">📝</span>
-          <h1 className="text-3xl font-bold text-white tracking-tight">통서</h1>
+          <h1 className="text-3xl font-bold text-white tracking-tight">통서(通書)</h1>
           <p className="text-gray-400 text-center text-sm leading-relaxed">
             메모를 입력하면 AI가 자동으로 분류해드립니다
           </p>
