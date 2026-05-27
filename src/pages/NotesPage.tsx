@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -28,41 +28,60 @@ function NoteCard({
   categories,
   onEdit,
   onDelete,
+  onCategoryChange,
 }: {
   note: Note
   categories: Category[]
   onEdit: (note: Note) => void
   onDelete: (id: string) => void
+  onCategoryChange: (id: string, category: string) => void
 }) {
+  const [showPicker, setShowPicker] = useState(false)
+  const pickerRef = useRef<HTMLDivElement>(null)
   const cat = categories.find(c => c.name === (note.is_manual ? note.manual_category : note.category))
+
+  useEffect(() => {
+    if (!showPicker) return
+    const handler = (e: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) setShowPicker(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [showPicker])
 
   return (
     <div className="bg-[#1c1c27] rounded-xl border border-[#2e2e42] px-3 py-2 flex flex-col gap-1">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
-          {cat && (
-            <span
-              className="px-1.5 py-0.5 rounded-full text-[10px] font-medium text-white"
-              style={{ backgroundColor: cat.color ?? '#7c3aed' }}
+        <div className="flex items-center gap-1.5" ref={pickerRef}>
+          <div className="relative">
+            <button
+              onClick={() => setShowPicker(v => !v)}
+              className="flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium text-white transition-opacity hover:opacity-80"
+              style={{ backgroundColor: cat?.color ?? '#4b5563' }}
             >
-              {cat.emoji} {cat.name}
-            </span>
-          )}
+              {cat ? `${cat.emoji} ${cat.name}` : '📥 미분류'}
+              <span className="opacity-60">▾</span>
+            </button>
+            {showPicker && (
+              <div className="absolute top-full left-0 mt-1 z-30 bg-[#1e1e2e] border border-[#3a3a50] rounded-xl p-2 flex flex-wrap gap-1.5 min-w-[180px] shadow-xl">
+                {categories.map(c => (
+                  <button
+                    key={c.id}
+                    onClick={() => { onCategoryChange(note.id, c.name); setShowPicker(false) }}
+                    className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium text-white transition-opacity hover:opacity-80 ${cat?.name === c.name ? 'ring-1 ring-white/40' : ''}`}
+                    style={{ backgroundColor: c.color ?? '#7c3aed' }}
+                  >
+                    {c.emoji} {c.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <span className="text-[10px] text-gray-600">{formatTime(note.created_at)}</span>
         </div>
         <div className="flex items-center gap-0.5">
-          <button
-            onClick={() => onEdit(note)}
-            className="p-1 text-gray-600 hover:text-violet-400 transition-colors text-xs"
-          >
-            ✏️
-          </button>
-          <button
-            onClick={() => onDelete(note.id)}
-            className="p-1 text-gray-600 hover:text-red-400 transition-colors text-xs"
-          >
-            🗑️
-          </button>
+          <button onClick={() => onEdit(note)} className="p-1 text-gray-600 hover:text-violet-400 transition-colors text-xs">✏️</button>
+          <button onClick={() => onDelete(note.id)} className="p-1 text-gray-600 hover:text-red-400 transition-colors text-xs">🗑️</button>
         </div>
       </div>
       <p className="text-xs text-gray-400 leading-relaxed line-clamp-2">{note.content}</p>
@@ -112,6 +131,11 @@ export default function NotesPage() {
   }
 
   useEffect(() => { fetchData() }, [user])
+
+  const handleCategoryChange = async (id: string, category: string) => {
+    await supabase.from('notes').update({ category, is_manual: true, manual_category: category }).eq('id', id)
+    setNotes(prev => prev.map(n => n.id === id ? { ...n, category, is_manual: true, manual_category: category } : n))
+  }
 
   const handleDelete = async (id: string) => {
     if (!confirm('이 메모를 삭제할까요?')) return
@@ -256,6 +280,7 @@ export default function NotesPage() {
                 categories={categories}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onCategoryChange={handleCategoryChange}
               />
             ))}
           </div>
@@ -273,6 +298,7 @@ export default function NotesPage() {
                     categories={categories}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    onCategoryChange={handleCategoryChange}
                   />
                 ))}
               </div>

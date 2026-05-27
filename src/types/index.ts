@@ -6,6 +6,7 @@ export interface UserProfile {
   default_manual_category: string | null
   trash_days: number
   notification_enabled: boolean
+  ai_classify_enabled: boolean
   created_at: string
 }
 

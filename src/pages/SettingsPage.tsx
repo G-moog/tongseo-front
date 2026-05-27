@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import SideDrawer from '../components/SideDrawer'
@@ -59,6 +60,7 @@ function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) =>
 }
 
 export default function SettingsPage() {
+  const navigate = useNavigate()
   const { user, profile, signOut, refreshProfile } = useAuth()
   const [drawerOpen, setDrawerOpen] = useState(false)
 
@@ -72,6 +74,7 @@ export default function SettingsPage() {
   const [apiKeySaving, setApiKeySaving] = useState(false)
   const [apiKeyMsg, setApiKeyMsg] = useState('')
   const [defaultCategory, setDefaultCategory] = useState(profile?.default_manual_category ?? '')
+  const [aiClassifyEnabled, setAiClassifyEnabled] = useState(profile?.ai_classify_enabled ?? true)
 
   // ── 알림
   const [notifEnabled, setNotifEnabled] = useState(profile?.notification_enabled ?? true)
@@ -128,6 +131,14 @@ export default function SettingsPage() {
     if (!user) return
     setDefaultCategory(val)
     await supabase.from('users').update({ default_manual_category: val || null }).eq('id', user.id)
+    await refreshProfile()
+  }
+
+  // ── AI 자동분류 ON/OFF
+  const saveAiClassify = async (val: boolean) => {
+    if (!user) return
+    setAiClassifyEnabled(val)
+    await supabase.from('users').update({ ai_classify_enabled: val }).eq('id', user.id)
     await refreshProfile()
   }
 
@@ -257,6 +268,11 @@ export default function SettingsPage() {
 
         {/* ── AI 설정 */}
         <Section title="AI 설정">
+          <Row
+            label="AI 자동분류"
+            sublabel={aiClassifyEnabled ? '메모 저장 시 AI가 자동으로 분류합니다' : 'AI 분류 없이 기본 카테고리로 저장됩니다'}
+            right={<Toggle value={aiClassifyEnabled} onChange={saveAiClassify} />}
+          />
           <div className="px-4 py-3.5 border-b border-[#2e2e42] flex flex-col gap-2">
             <span className="text-sm font-medium text-gray-200">Claude API 키 변경</span>
             <input type="password" value={newApiKey} onChange={e => setNewApiKey(e.target.value)}
@@ -269,12 +285,21 @@ export default function SettingsPage() {
             </button>
           </div>
           <div className="px-4 py-3.5 border-b border-[#2e2e42] flex flex-col gap-2">
-            <span className="text-sm font-medium text-gray-200">메모 작성 기본 분류</span>
+            <span className="text-sm font-medium text-gray-200">AI OFF 시 기본 저장 카테고리</span>
             <select value={defaultCategory} onChange={e => saveDefaultCategory(e.target.value)}
               className="w-full px-3 py-2 bg-[#111118] border border-[#2e2e42] rounded-lg text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-violet-500">
-              <option value="">✨ 자동분류 (AI)</option>
+              <option value="">📥 미분류</option>
               {categories.map(c => <option key={c.id} value={c.name}>{c.emoji} {c.name}</option>)}
             </select>
+          </div>
+          <div className="px-4 py-3.5 flex flex-col gap-2">
+            <span className="text-sm font-medium text-gray-200">미분류 메모 AI 분류</span>
+            <span className="text-xs text-gray-500">미분류 상태의 메모를 AI가 일괄 분류합니다</span>
+            <button
+              onClick={() => navigate('/classify-review')}
+              className="self-start px-4 py-1.5 bg-violet-600/20 border border-violet-500/30 text-violet-300 text-xs font-medium rounded-lg hover:bg-violet-600/30 transition-colors">
+              ✨ 분류 시작
+            </button>
           </div>
         </Section>
 

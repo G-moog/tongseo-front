@@ -8,6 +8,7 @@ import NotesPage from './pages/NotesPage'
 import EditNotePage from './pages/EditNotePage'
 import MyPage from './pages/MyPage'
 import SettingsPage from './pages/SettingsPage'
+import ClassifyReviewPage from './pages/ClassifyReviewPage'
 
 export default function App() {
   return (
@@ -35,6 +36,9 @@ export default function App() {
             } />
             <Route path="/settings" element={
               <RequireAuth><SettingsPage /></RequireAuth>
+            } />
+            <Route path="/classify-review" element={
+              <RequireAuth><ClassifyReviewPage /></RequireAuth>
             } />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

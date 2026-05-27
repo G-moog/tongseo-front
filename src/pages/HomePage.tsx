@@ -38,8 +38,10 @@ export default function HomePage() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [recentNotes, setRecentNotes] = useState<Note[]>([])
+  const aiEnabled = profile?.ai_classify_enabled ?? true
+
   const [content, setContent] = useState('')
-  const [isManual, setIsManual] = useState(false)
+  const [isManual, setIsManual] = useState(!aiEnabled)
   const [selectedCategory, setSelectedCategory] = useState('')
   const [showCategoryPicker, setShowCategoryPicker] = useState(false)
   const [imageFiles, setImageFiles] = useState<File[]>([])
@@ -76,7 +78,7 @@ export default function HomePage() {
       .order('created_at')
       .then(({ data }) => {
         setCategories(data ?? [])
-        const defaultCat = profile?.default_manual_category ?? data?.[0]?.name ?? ''
+        const defaultCat = profile?.default_manual_category ?? '미분류'
         setSelectedCategory(defaultCat)
       })
     fetchRecent()
@@ -135,9 +137,12 @@ export default function HomePage() {
         ? await uploadImages(user.id, imageFiles)
         : []
 
+      const fallbackCat = profile?.default_manual_category ?? '미분류'
       const payload = isManual
         ? { user_id: user.id, content, is_manual: true, manual_category: selectedCategory, category: selectedCategory, image_urls: uploadedUrls }
-        : { user_id: user.id, content, is_manual: false, category: result?.category ?? null, title: result?.title ?? null, summary: result?.summary ?? null, remind_at: remindAt, image_urls: uploadedUrls }
+        : result
+          ? { user_id: user.id, content, is_manual: false, category: result.category, title: result.title, summary: result.summary, remind_at: remindAt, image_urls: uploadedUrls }
+          : { user_id: user.id, content, is_manual: false, category: fallbackCat, image_urls: uploadedUrls }
 
       const { error } = await supabase.from('notes').insert(payload as never)
       if (error) throw error
@@ -169,8 +174,8 @@ export default function HomePage() {
     if ((!hasContent && !hasImages) || loading) return
     setError('')
 
-    // 이미지만 있거나 수동분류면 AI 분류 없이 바로 저장
-    if (isManual || !hasContent) {
+    // AI OFF이거나, 수동분류이거나, 이미지만 있을 때 바로 저장
+    if (!aiEnabled || isManual || !hasContent) {
       await saveNote(null, null)
       return
     }
@@ -427,7 +432,7 @@ export default function HomePage() {
                   {imagePreviews.length > 0 && <span className="text-violet-400">{imagePreviews.length}</span>}
                 </button>
                 {/* 자동분류 / 수동분류 토글 버튼 */}
-                {!isManual ? (
+                {!isManual && aiEnabled ? (
                   <button
                     onClick={() => setIsManual(true)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-600/20 border border-violet-500/30 text-violet-300 text-xs font-medium hover:bg-violet-600/30 transition-colors"
@@ -446,12 +451,14 @@ export default function HomePage() {
                       <span>{selectedCategory || '카테고리'}</span>
                       <span className="text-gray-500">▾</span>
                     </button>
-                    <button
-                      onClick={() => { setIsManual(false); setShowCategoryPicker(false) }}
-                      className="px-2 py-1.5 rounded-lg text-gray-600 hover:text-gray-400 text-xs transition-colors"
-                    >
-                      ✕
-                    </button>
+                    {aiEnabled && (
+                      <button
+                        onClick={() => { setIsManual(false); setShowCategoryPicker(false) }}
+                        className="px-2 py-1.5 rounded-lg text-gray-600 hover:text-gray-400 text-xs transition-colors"
+                      >
+                        ✕
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
