@@ -45,13 +45,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  // ── Effect 2: 세션이 확정된 뒤 프로필 로딩 (React 렌더 이후 실행되므로 클라이언트 세션이 커밋된 상태)
+  // ── Effect 2: 세션이 확정된 뒤 프로필 로딩 + 미분류 카테고리 보장
   useEffect(() => {
-    if (session === undefined) return   // 아직 모름 — 대기
-    if (session === null) return        // 로그아웃 — 프로필 불필요
+    if (session === undefined) return
+    if (session === null) return
 
-    setProfile(undefined) // 로딩 중 표시
-    fetchProfileFromDB(session.user.id).then(setProfile)
+    const userId = session.user.id
+    setProfile(undefined)
+
+    fetchProfileFromDB(userId).then(async (p) => {
+      setProfile(p)
+      // 미분류 카테고리가 없으면 자동 생성 (신규 유저 대응)
+      const { data: existing } = await supabase
+        .from('categories')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('name', '미분류')
+        .maybeSingle()
+      if (!existing) {
+        await supabase.from('categories').insert({
+          user_id: userId,
+          name: '미분류',
+          emoji: '📥',
+          color: '#6b7280',
+          is_default: true,
+        })
+      }
+    })
   }, [session?.user?.id])
 
   const loading =
