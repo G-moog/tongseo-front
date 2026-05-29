@@ -277,11 +277,11 @@ export default function HomePage() {
 
   // ── 메인 입력 화면
   return (
-    <div className="flex flex-col min-h-svh bg-[#111118]">
+    <div className="flex flex-col h-svh bg-[#111118]">
       <SideDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
 
       {/* 상단 바 */}
-      <header className="flex items-center justify-between px-4 py-3">
+      <header className="flex items-center justify-between px-4 py-3 shrink-0">
         <button
           onClick={() => setDrawerOpen(true)}
           className="w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded-lg hover:bg-[#1c1c27] transition-colors"
@@ -294,16 +294,16 @@ export default function HomePage() {
         <div className="w-9" />
       </header>
 
-      {/* 최근 메모 피드 */}
-      <div className="px-4 pt-2 pb-1 flex flex-col gap-1.5">
+      {/* 메모 피드 — 스크롤 영역 */}
+      <div className="flex-1 overflow-y-auto px-4 pt-1 pb-2 flex flex-col gap-1.5 min-h-0">
         {recentNotes.length === 0 ? (
-          <p className="text-center text-gray-700 text-xs py-3">첫 메모를 작성해보세요</p>
+          <p className="text-center text-gray-700 text-xs py-6">첫 메모를 작성해보세요</p>
         ) : recentNotes.map(note => {
           const cat = categories.find(c => c.name === (note.is_manual ? note.manual_category : note.category))
           return (
             <div
               key={note.id}
-              className="bg-[#1c1c27] rounded-xl border border-[#2e2e42] px-3 py-2 flex flex-col gap-1"
+              className="bg-[#1c1c27] rounded-xl border border-[#2e2e42] px-3 py-2 flex flex-col gap-1 shrink-0"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
@@ -315,7 +315,7 @@ export default function HomePage() {
                       {cat.emoji} {cat.name}
                     </span>
                   )}
-                  <span className="text-[10px] text-gray-600">{formatTime(note.created_at)}</span>
+                  <span className="text-[10px] text-gray-600">{formatTime(note.updated_at)}</span>
                 </div>
                 <div className="flex items-center gap-0.5">
                   <button
@@ -349,9 +349,9 @@ export default function HomePage() {
         })}
       </div>
 
-      {/* 입력 영역 */}
-      <main className="flex-1 flex flex-col px-4 pb-4">
-        <div className="flex-1 flex flex-col justify-end gap-3">
+      {/* 입력 영역 — 하단 고정 */}
+      <main className="shrink-0 px-4 pb-4 pt-2 border-t border-[#1e1e2e]">
+        <div className="flex flex-col gap-3">
 
           {/* 성공 메시지 */}
           {success && (
