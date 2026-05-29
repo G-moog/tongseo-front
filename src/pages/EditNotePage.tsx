@@ -7,8 +7,6 @@ import type { Category, Note } from '../types'
 
 interface ClassifyResult {
   category: string
-  title: string
-  summary: string
   remind_at: string | null
 }
 
@@ -109,7 +107,7 @@ export default function EditNotePage() {
 
       const payload = isManual
         ? { content, is_manual: true, manual_category: selectedCategory, category: selectedCategory, title: null, summary: null, image_urls }
-        : { content, is_manual: false, category: result?.category ?? null, title: result?.title ?? null, summary: result?.summary ?? null, remind_at: remindAt, image_urls }
+        : { content, is_manual: false, category: result?.category ?? null, remind_at: remindAt, image_urls }
 
       const { error } = await supabase.from('notes')
         .update({ ...payload, updated_at: new Date().toISOString() })

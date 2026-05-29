@@ -54,25 +54,30 @@ export default function ClassifyReviewPage() {
       return
     }
 
-    const results: ReviewItem[] = []
-    for (let i = 0; i < unclassified.length; i++) {
-      const note = unclassified[i]
-      setProgress({ current: i + 1, total: unclassified.length })
-      try {
-        if (note.content?.trim()) {
-          const { data } = await supabase.functions.invoke('classify-note', {
-            body: { content: note.content.trim() },
-          })
-          results.push({ note, category: data?.category ?? '미분류', confirmed: false })
-        } else {
-          results.push({ note, category: '미분류', confirmed: false })
-        }
-      } catch {
-        results.push({ note, category: '미분류', confirmed: false })
-      }
+    setProgress({ current: 0, total: unclassified.length })
+
+    try {
+      const { data, error } = await supabase.functions.invoke('batch-classify', { body: {} })
+      if (error) throw error
+
+      // note_id → category 매핑
+      type BatchResult = { note_id: string; category: string }
+      const resultMap = new Map<string, string>(
+        (data?.results ?? []).map((r: BatchResult) => [r.note_id, r.category])
+      )
+
+      setItems(unclassified.map(note => ({
+        note,
+        category: resultMap.get(note.id) ?? '미분류',
+        confirmed: false,
+      })))
+      setProgress({ current: data?.classified ?? unclassified.length, total: unclassified.length })
+    } catch {
+      // 실패 시 모두 미분류로 표시, 수동 지정 가능
+      setItems(unclassified.map(note => ({ note, category: '미분류', confirmed: false })))
+      setError('AI 분류 중 오류가 발생했습니다. 카테고리를 직접 지정해주세요.')
     }
 
-    setItems(results)
     setPhase('review')
   }
 

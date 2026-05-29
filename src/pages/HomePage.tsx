@@ -20,8 +20,6 @@ function formatTime(iso: string) {
 
 interface ClassifyResult {
   category: string
-  title: string
-  summary: string
   remind_at: string | null
 }
 
@@ -141,7 +139,7 @@ export default function HomePage() {
       const payload = isManual
         ? { user_id: user.id, content, is_manual: true, manual_category: selectedCategory, category: selectedCategory, image_urls: uploadedUrls }
         : result
-          ? { user_id: user.id, content, is_manual: false, category: result.category, title: result.title, summary: result.summary, remind_at: remindAt, image_urls: uploadedUrls }
+          ? { user_id: user.id, content, is_manual: false, category: result.category, remind_at: remindAt, image_urls: uploadedUrls }
           : { user_id: user.id, content, is_manual: false, category: fallbackCat, image_urls: uploadedUrls }
 
       const { error } = await supabase.from('notes').insert(payload as never)

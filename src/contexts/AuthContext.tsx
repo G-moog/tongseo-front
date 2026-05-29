@@ -53,25 +53,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const userId = session.user.id
     setProfile(undefined)
 
-    fetchProfileFromDB(userId).then(async (p) => {
-      setProfile(p)
-      // 미분류 카테고리가 없으면 자동 생성 (신규 유저 대응)
-      const { data: existing } = await supabase
-        .from('categories')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('name', '미분류')
-        .maybeSingle()
-      if (!existing) {
-        await supabase.from('categories').insert({
-          user_id: userId,
-          name: '미분류',
-          emoji: '📥',
-          color: '#6b7280',
-          is_default: true,
-        })
-      }
-    })
+    // DB 트리거가 신규 유저 프로필 + 미분류 카테고리를 자동 생성하므로 별도 처리 불필요
+    fetchProfileFromDB(userId).then(setProfile)
   }, [session?.user?.id])
 
   const loading =

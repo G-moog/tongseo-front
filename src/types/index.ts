@@ -30,6 +30,7 @@ export interface Note {
   is_manual: boolean
   manual_category: string | null
   remind_at: string | null
+  reminded_at: string | null
   is_deleted: boolean
   deleted_at: string | null
   image_urls: string[] | null
