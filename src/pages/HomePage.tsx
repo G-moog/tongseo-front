@@ -62,8 +62,7 @@ export default function HomePage() {
       .select('*')
       .eq('user_id', user.id)
       .eq('is_deleted', false)
-      .order('created_at', { ascending: false })
-      .limit(5)
+      .order('updated_at', { ascending: false })
     setRecentNotes(data ?? [])
   }
 
