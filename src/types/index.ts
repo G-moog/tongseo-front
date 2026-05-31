@@ -1,3 +1,20 @@
+export interface Routine {
+  id: string
+  user_id: string
+  title: string
+  days: number[]   // 0=일 1=월 2=화 3=수 4=목 5=금 6=토
+  sort_order: number
+  created_at: string
+}
+
+export interface RoutineCheck {
+  id: string
+  routine_id: string
+  user_id: string
+  checked_date: string  // "YYYY-MM-DD"
+  created_at: string
+}
+
 export interface UserProfile {
   id: string
   email: string

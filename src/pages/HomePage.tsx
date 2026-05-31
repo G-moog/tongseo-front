@@ -4,7 +4,19 @@ import { supabase } from '../lib/supabase'
 import { uploadImages } from '../lib/uploadImages'
 import { useAuth } from '../contexts/AuthContext'
 import SideDrawer from '../components/SideDrawer'
+import DailyRoutinesWidget from '../components/DailyRoutinesWidget'
 import type { Category, Note } from '../types'
+
+const DAY_KO = ['일', '월', '화', '수', '목', '금', '토']
+
+function useClock() {
+  const [now, setNow] = useState(new Date())
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 60000)
+    return () => clearInterval(t)
+  }, [])
+  return now
+}
 
 function formatTime(iso: string) {
   const d = new Date(iso)
@@ -28,6 +40,7 @@ type Step = 'write' | 'confirm_remind' | 'pick_remind'
 export default function HomePage() {
   const navigate = useNavigate()
   const { user, profile } = useAuth()
+  const now = useClock()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const categoryPickerRef = useRef<HTMLDivElement>(null)
 
@@ -290,9 +303,19 @@ export default function HomePage() {
           <span className="w-5 h-0.5 bg-gray-400 rounded-full" />
           <span className="w-5 h-0.5 bg-gray-400 rounded-full" />
         </button>
-        <span className="text-gray-500 text-sm font-medium">통서(通書)</span>
+        <div className="flex flex-col items-center">
+          <span className="text-sm font-medium text-gray-200">
+            {now.getMonth() + 1}월 {now.getDate()}일 {DAY_KO[now.getDay()]}요일
+          </span>
+          <span className="text-xs text-gray-500">
+            {String(now.getHours()).padStart(2, '0')}:{String(now.getMinutes()).padStart(2, '0')}
+          </span>
+        </div>
         <div className="w-9" />
       </header>
+
+      {/* Daily Routines 위젯 */}
+      <DailyRoutinesWidget />
 
       {/* 메모 피드 — 스크롤 영역 */}
       <div className="flex-1 overflow-y-auto px-4 pt-1 pb-2 flex flex-col gap-1.5 min-h-0">

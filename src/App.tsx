@@ -10,6 +10,7 @@ import EditNotePage from './pages/EditNotePage'
 import MyPage from './pages/MyPage'
 import SettingsPage from './pages/SettingsPage'
 import ClassifyReviewPage from './pages/ClassifyReviewPage'
+import RoutinesPage from './pages/RoutinesPage'
 
 function AppInner() {
   useFCM()
@@ -24,6 +25,7 @@ function AppInner() {
         <Route path="/mypage" element={<RequireAuth><MyPage /></RequireAuth>} />
         <Route path="/settings" element={<RequireAuth><SettingsPage /></RequireAuth>} />
         <Route path="/classify-review" element={<RequireAuth><ClassifyReviewPage /></RequireAuth>} />
+        <Route path="/routines" element={<RequireAuth><RoutinesPage /></RequireAuth>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>
