@@ -55,11 +55,11 @@ export default function DailyRoutinesWidget() {
 
   return (
     <div className="px-4 pt-2 pb-1 shrink-0">
-      <div className="bg-[#1f1d00] border border-[#5a5500] rounded-xl overflow-hidden">
+      <div className="bg-[#1a1900] border-2 border-yellow-500/60 rounded-xl overflow-hidden">
         {/* 헤더 */}
-        <div className="px-3 py-2 border-b border-[#5a5500] flex items-center justify-between">
-          <span className="text-xs font-semibold text-yellow-400 tracking-wider">Daily Routines</span>
-          <span className={`text-[10px] font-medium ${allDone ? 'text-yellow-300' : 'text-yellow-700'}`}>
+        <div className="px-3 py-2 border-b border-yellow-500/30 flex items-center justify-between">
+          <span className="text-sm font-bold text-yellow-400 tracking-wide">Daily Routines</span>
+          <span className={`text-xs font-semibold tabular-nums ${allDone ? 'text-yellow-300' : 'text-yellow-500'}`}>
             {doneCount}/{todayRoutines.length} {allDone ? '✓' : ''}
           </span>
         </div>
@@ -71,25 +71,25 @@ export default function DailyRoutinesWidget() {
               <button
                 key={routine.id}
                 onClick={() => toggle(routine.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 hover:bg-[#2e2b00] active:bg-[#353200] transition-colors text-left ${
-                  i < todayRoutines.length - 1 ? 'border-b border-[#5a5500]' : ''
+                className={`w-full flex items-center gap-3 px-3 py-2.5 hover:bg-yellow-500/5 active:bg-yellow-500/10 transition-colors text-left ${
+                  i < todayRoutines.length - 1 ? 'border-b border-yellow-500/20' : ''
                 }`}
               >
                 {/* 체크박스 */}
                 <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-all ${
                   checked
                     ? 'bg-yellow-400 border-yellow-400'
-                    : 'border-yellow-600/70 bg-transparent'
+                    : 'border-gray-600 bg-transparent'
                 }`}>
                   {checked && (
-                    <svg className="w-2.5 h-2.5 text-[#1f1d00]" fill="none" viewBox="0 0 10 10">
+                    <svg className="w-2.5 h-2.5 text-[#1a1900]" fill="none" viewBox="0 0 10 10">
                       <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   )}
                 </div>
-                {/* 텍스트 */}
+                {/* 텍스트 — 다른 메모와 동일한 무채색 */}
                 <span className={`text-sm transition-all ${
-                  checked ? 'line-through text-yellow-800' : 'text-yellow-200'
+                  checked ? 'line-through text-gray-600' : 'text-gray-200'
                 }`}>
                   {routine.title}
                 </span>
