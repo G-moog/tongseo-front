@@ -55,11 +55,11 @@ export default function DailyRoutinesWidget() {
 
   return (
     <div className="px-4 pt-2 pb-1 shrink-0">
-      <div className="bg-[#1c1c27] border border-[#2e2e42] rounded-xl overflow-hidden">
+      <div className="bg-[#1a1600] border border-[#3d2e08] rounded-xl overflow-hidden">
         {/* 헤더 */}
-        <div className="px-3 py-2 border-b border-[#2e2e42] flex items-center justify-between">
-          <span className="text-xs font-semibold text-gray-500 tracking-wider">Daily Routines</span>
-          <span className={`text-[10px] font-medium ${allDone ? 'text-violet-400' : 'text-gray-600'}`}>
+        <div className="px-3 py-2 border-b border-[#3d2e08] flex items-center justify-between">
+          <span className="text-xs font-semibold text-amber-600/80 tracking-wider">Daily Routines</span>
+          <span className={`text-[10px] font-medium ${allDone ? 'text-amber-400' : 'text-amber-800'}`}>
             {doneCount}/{todayRoutines.length} {allDone ? '✓' : ''}
           </span>
         </div>
@@ -71,25 +71,25 @@ export default function DailyRoutinesWidget() {
               <button
                 key={routine.id}
                 onClick={() => toggle(routine.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 hover:bg-[#252535] active:bg-[#2a2a3d] transition-colors text-left ${
-                  i < todayRoutines.length - 1 ? 'border-b border-[#2e2e42]' : ''
+                className={`w-full flex items-center gap-3 px-3 py-2.5 hover:bg-[#251e00] active:bg-[#2e2500] transition-colors text-left ${
+                  i < todayRoutines.length - 1 ? 'border-b border-[#3d2e08]' : ''
                 }`}
               >
                 {/* 체크박스 */}
                 <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-all ${
                   checked
-                    ? 'bg-violet-600 border-violet-600'
-                    : 'border-[#4a4a60] bg-transparent'
+                    ? 'bg-amber-500 border-amber-500'
+                    : 'border-amber-800/60 bg-transparent'
                 }`}>
                   {checked && (
-                    <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 10 10">
+                    <svg className="w-2.5 h-2.5 text-[#1a1600]" fill="none" viewBox="0 0 10 10">
                       <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   )}
                 </div>
                 {/* 텍스트 */}
                 <span className={`text-sm transition-all ${
-                  checked ? 'line-through text-gray-600' : 'text-gray-200'
+                  checked ? 'line-through text-amber-900' : 'text-amber-100/90'
                 }`}>
                   {routine.title}
                 </span>
