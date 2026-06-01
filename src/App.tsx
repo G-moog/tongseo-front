@@ -11,6 +11,7 @@ import MyPage from './pages/MyPage'
 import SettingsPage from './pages/SettingsPage'
 import ClassifyReviewPage from './pages/ClassifyReviewPage'
 import RoutinesPage from './pages/RoutinesPage'
+import EmergencyTasksPage from './pages/EmergencyTasksPage'
 
 function AppInner() {
   useFCM()
@@ -26,6 +27,7 @@ function AppInner() {
         <Route path="/settings" element={<RequireAuth><SettingsPage /></RequireAuth>} />
         <Route path="/classify-review" element={<RequireAuth><ClassifyReviewPage /></RequireAuth>} />
         <Route path="/routines" element={<RequireAuth><RoutinesPage /></RequireAuth>} />
+        <Route path="/emergency" element={<RequireAuth><EmergencyTasksPage /></RequireAuth>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>

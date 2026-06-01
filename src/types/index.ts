@@ -49,6 +49,7 @@ export interface Note {
   remind_at: string | null
   reminded_at: string | null
   is_emergency: boolean
+  emergency_order: number
   is_deleted: boolean
   deleted_at: string | null
   image_urls: string[] | null

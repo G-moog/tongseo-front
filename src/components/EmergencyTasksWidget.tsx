@@ -26,7 +26,7 @@ export default function EmergencyTasksWidget({ onUpdate }: Props) {
       .eq('user_id', user.id)
       .eq('is_emergency', true)
       .eq('is_deleted', false)
-      .order('updated_at', { ascending: false })
+      .order('emergency_order', { ascending: true })
     setNotes(data ?? [])
   }
 

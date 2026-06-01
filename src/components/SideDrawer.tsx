@@ -61,6 +61,14 @@ export default function SideDrawer({ open, onClose }: Props) {
             Daily Routines
           </button>
 
+          <button
+            onClick={() => go('/emergency')}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-300 hover:bg-[#252535] hover:text-white transition-colors text-sm"
+          >
+            <span className="text-base">🚨</span>
+            Emergency Tasks
+          </button>
+
           <div className="my-2 border-t border-[#2e2e42]" />
 
           <p className="text-[11px] text-gray-600 font-semibold uppercase tracking-wider px-3 mb-1 mt-1">메모</p>
