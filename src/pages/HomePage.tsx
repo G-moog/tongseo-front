@@ -5,6 +5,7 @@ import { uploadImages } from '../lib/uploadImages'
 import { useAuth } from '../contexts/AuthContext'
 import SideDrawer from '../components/SideDrawer'
 import DailyRoutinesWidget from '../components/DailyRoutinesWidget'
+import EmergencyTasksWidget from '../components/EmergencyTasksWidget'
 import type { Category, Note } from '../types'
 
 const DAY_KO = ['일', '월', '화', '수', '목', '금', '토']
@@ -317,6 +318,9 @@ export default function HomePage() {
       {/* Daily Routines 위젯 */}
       <DailyRoutinesWidget />
 
+      {/* Emergency Tasks 위젯 */}
+      <EmergencyTasksWidget onUpdate={fetchRecent} />
+
       {/* 메모 피드 — 스크롤 영역 */}
       <div className="flex-1 overflow-y-auto px-4 pt-1 pb-2 flex flex-col gap-1.5 min-h-0">
         {recentNotes.length === 0 ? (
@@ -341,6 +345,16 @@ export default function HomePage() {
                   <span className="text-[10px] text-gray-600">{formatTime(note.updated_at)}</span>
                 </div>
                 <div className="flex items-center gap-0.5">
+                  <button
+                    onClick={async () => {
+                      await supabase.from('notes').update({ is_emergency: !note.is_emergency }).eq('id', note.id)
+                      fetchRecent()
+                    }}
+                    className={`p-1 transition-colors text-xs ${note.is_emergency ? 'text-red-400' : 'text-gray-600 hover:text-red-400'}`}
+                    title={note.is_emergency ? '긴급 해제' : '긴급 등록'}
+                  >
+                    🚨
+                  </button>
                   <button
                     onClick={() => navigate('/edit', { state: { note } })}
                     className="p-1 text-gray-600 hover:text-violet-400 transition-colors text-xs"

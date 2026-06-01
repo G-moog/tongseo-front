@@ -48,6 +48,7 @@ export interface Note {
   manual_category: string | null
   remind_at: string | null
   reminded_at: string | null
+  is_emergency: boolean
   is_deleted: boolean
   deleted_at: string | null
   image_urls: string[] | null

@@ -29,12 +29,14 @@ function NoteCard({
   onEdit,
   onDelete,
   onCategoryChange,
+  onEmergencyToggle,
 }: {
   note: Note
   categories: Category[]
   onEdit: (note: Note) => void
   onDelete: (id: string) => void
   onCategoryChange: (id: string, category: string) => void
+  onEmergencyToggle: (id: string, current: boolean) => void
 }) {
   const [showPicker, setShowPicker] = useState(false)
   const pickerRef = useRef<HTMLDivElement>(null)
@@ -80,6 +82,12 @@ function NoteCard({
           <span className="text-[10px] text-gray-600">{formatTime(note.created_at)}</span>
         </div>
         <div className="flex items-center gap-0.5">
+          <button
+            onClick={() => onEmergencyToggle(note.id, note.is_emergency)}
+            className={`p-1 transition-colors text-xs ${note.is_emergency ? 'text-red-400' : 'text-gray-600 hover:text-red-400'}`}
+          >
+            🚨
+          </button>
           <button onClick={() => onEdit(note)} className="p-1 text-gray-600 hover:text-violet-400 transition-colors text-xs">✏️</button>
           <button onClick={() => onDelete(note.id)} className="p-1 text-gray-600 hover:text-red-400 transition-colors text-xs">🗑️</button>
         </div>
@@ -135,6 +143,11 @@ export default function NotesPage() {
   const handleCategoryChange = async (id: string, category: string) => {
     await supabase.from('notes').update({ category, is_manual: true, manual_category: category }).eq('id', id)
     setNotes(prev => prev.map(n => n.id === id ? { ...n, category, is_manual: true, manual_category: category } : n))
+  }
+
+  const handleEmergencyToggle = async (id: string, current: boolean) => {
+    await supabase.from('notes').update({ is_emergency: !current }).eq('id', id)
+    setNotes(prev => prev.map(n => n.id === id ? { ...n, is_emergency: !current } : n))
   }
 
   const handleDelete = async (id: string) => {
@@ -281,6 +294,7 @@ export default function NotesPage() {
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onCategoryChange={handleCategoryChange}
+                onEmergencyToggle={handleEmergencyToggle}
               />
             ))}
           </div>
@@ -299,6 +313,7 @@ export default function NotesPage() {
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onCategoryChange={handleCategoryChange}
+                    onEmergencyToggle={handleEmergencyToggle}
                   />
                 ))}
               </div>
