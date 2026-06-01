@@ -48,6 +48,7 @@ export default function HomePage() {
   const imageInputRef = useRef<HTMLInputElement>(null)
 
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [emergencyRefreshKey, setEmergencyRefreshKey] = useState(0)
   const [categories, setCategories] = useState<Category[]>([])
   const [recentNotes, setRecentNotes] = useState<Note[]>([])
   const aiEnabled = profile?.ai_classify_enabled ?? true
@@ -319,13 +320,13 @@ export default function HomePage() {
       <DailyRoutinesWidget />
 
       {/* Emergency Tasks 위젯 */}
-      <EmergencyTasksWidget onUpdate={fetchRecent} />
+      <EmergencyTasksWidget key={emergencyRefreshKey} onUpdate={() => { fetchRecent(); setEmergencyRefreshKey(k => k + 1) }} />
 
-      {/* 메모 피드 — 스크롤 영역 */}
+      {/* 메모 피드 — 스크롤 영역 (긴급 메모 제외) */}
       <div className="flex-1 overflow-y-auto px-4 pt-1 pb-2 flex flex-col gap-1.5 min-h-0">
-        {recentNotes.length === 0 ? (
+        {recentNotes.filter(n => !n.is_emergency).length === 0 ? (
           <p className="text-center text-gray-700 text-xs py-6">첫 메모를 작성해보세요</p>
-        ) : recentNotes.map(note => {
+        ) : recentNotes.filter(n => !n.is_emergency).map(note => {
           const cat = categories.find(c => c.name === (note.is_manual ? note.manual_category : note.category))
           return (
             <div
@@ -347,8 +348,10 @@ export default function HomePage() {
                 <div className="flex items-center gap-0.5">
                   <button
                     onClick={async () => {
-                      await supabase.from('notes').update({ is_emergency: !note.is_emergency }).eq('id', note.id)
-                      fetchRecent()
+                      const newVal = !note.is_emergency
+                      await supabase.from('notes').update({ is_emergency: newVal }).eq('id', note.id)
+                      setRecentNotes(prev => prev.map(n => n.id === note.id ? { ...n, is_emergency: newVal } : n))
+                      setEmergencyRefreshKey(k => k + 1)
                     }}
                     className={`p-1 transition-colors text-xs ${note.is_emergency ? 'text-red-400' : 'text-gray-600 hover:text-red-400'}`}
                   >
