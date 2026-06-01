@@ -351,7 +351,6 @@ export default function HomePage() {
                       fetchRecent()
                     }}
                     className={`p-1 transition-colors text-xs ${note.is_emergency ? 'text-red-400' : 'text-gray-600 hover:text-red-400'}`}
-                    title={note.is_emergency ? '긴급 해제' : '긴급 등록'}
                   >
                     🚨
                   </button>
