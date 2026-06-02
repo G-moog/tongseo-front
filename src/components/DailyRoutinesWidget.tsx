@@ -64,7 +64,7 @@ export default function DailyRoutinesWidget() {
           </span>
         </div>
         {/* 목록 */}
-        <div className="max-h-40 overflow-y-auto">
+        <div>
           {todayRoutines.map((routine, i) => {
             const checked = checkedIds.has(routine.id)
             return (
