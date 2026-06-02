@@ -50,7 +50,7 @@ export default function EmergencyTasksWidget({ onUpdate }: Props) {
           </span>
         </div>
         {/* 목록 */}
-        <div className="max-h-40 overflow-y-auto">
+        <div>
           {notes.map((note, i) => (
             <button
               key={note.id}
