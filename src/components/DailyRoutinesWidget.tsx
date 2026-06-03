@@ -54,7 +54,7 @@ export default function DailyRoutinesWidget() {
   const allDone = doneCount === todayRoutines.length
 
   return (
-    <div className="px-4 pt-2 pb-1 shrink-0">
+    <div className="px-4 pt-2 pb-1">
       <div className="bg-[#1a1900] border-2 border-yellow-500/60 rounded-xl overflow-hidden">
         {/* 헤더 */}
         <div className="px-3 py-2 border-b border-yellow-500/30 flex items-center justify-between">

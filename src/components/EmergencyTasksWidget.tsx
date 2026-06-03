@@ -40,7 +40,7 @@ export default function EmergencyTasksWidget({ onUpdate }: Props) {
   if (notes.length === 0) return null
 
   return (
-    <div className="px-4 pt-1 pb-1 shrink-0">
+    <div className="px-4 pt-1 pb-1">
       <div className="bg-[#1a0000] border-2 border-red-500/60 rounded-xl overflow-hidden">
         {/* 헤더 */}
         <div className="px-3 py-2 border-b border-red-500/30 flex items-center justify-between">

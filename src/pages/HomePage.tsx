@@ -319,43 +319,46 @@ export default function HomePage() {
         <div className="w-9" />
       </header>
 
-      {/* AI 분류 OFF 안내 배너 */}
-      {!aiEnabled && !bannerDismissed && (
-        <div className="mx-4 mt-2 mb-1 shrink-0 bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3 flex items-start justify-between gap-3">
-          <div className="flex gap-2 items-start flex-1">
-            <span className="text-amber-400 text-base shrink-0">💡</span>
-            <div className="flex flex-col gap-0.5">
-              <p className="text-xs text-amber-200 font-medium">현재 AI 분류가 꺼져 있어요.</p>
-              <p className="text-xs text-amber-400/70">
-                설정에서 Claude API 키를 등록하면 자동 분류를 사용할 수 있어요.
-              </p>
+      {/* 전체 스크롤 영역 (배너 + 위젯 + 메모 피드) */}
+      <div className="flex-1 overflow-y-auto min-h-0 flex flex-col">
+
+        {/* AI 분류 OFF 안내 배너 */}
+        {!aiEnabled && !bannerDismissed && (
+          <div className="mx-4 mt-2 mb-1 bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3 flex items-start justify-between gap-3">
+            <div className="flex gap-2 items-start flex-1">
+              <span className="text-amber-400 text-base shrink-0">💡</span>
+              <div className="flex flex-col gap-0.5">
+                <p className="text-xs text-amber-200 font-medium">현재 AI 분류가 꺼져 있어요.</p>
+                <p className="text-xs text-amber-400/70">
+                  설정에서 Claude API 키를 등록하면 자동 분류를 사용할 수 있어요.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => navigate('/settings')}
+                className="text-[11px] font-semibold text-amber-400 hover:text-amber-300 transition-colors whitespace-nowrap"
+              >
+                설정 →
+              </button>
+              <button
+                onClick={() => { setBannerDismissed(true); sessionStorage.setItem('banner_dismissed', 'true') }}
+                className="text-gray-600 hover:text-gray-400 transition-colors text-xs"
+              >
+                ✕
+              </button>
             </div>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={() => navigate('/settings')}
-              className="text-[11px] font-semibold text-amber-400 hover:text-amber-300 transition-colors whitespace-nowrap"
-            >
-              설정 →
-            </button>
-            <button
-              onClick={() => { setBannerDismissed(true); sessionStorage.setItem('banner_dismissed', 'true') }}
-              className="text-gray-600 hover:text-gray-400 transition-colors text-xs"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
+        )}
 
-      {/* Daily Routines 위젯 */}
-      <DailyRoutinesWidget />
+        {/* Daily Routines 위젯 */}
+        <DailyRoutinesWidget />
 
-      {/* Emergency Tasks 위젯 */}
-      <EmergencyTasksWidget key={emergencyRefreshKey} onUpdate={() => { fetchRecent(); setEmergencyRefreshKey(k => k + 1) }} />
+        {/* Emergency Tasks 위젯 */}
+        <EmergencyTasksWidget key={emergencyRefreshKey} onUpdate={() => { fetchRecent(); setEmergencyRefreshKey(k => k + 1) }} />
 
-      {/* 메모 피드 — 스크롤 영역 (긴급 메모 제외) */}
-      <div className="flex-1 overflow-y-auto px-4 pt-1 pb-2 flex flex-col gap-1.5 min-h-0">
+        {/* 메모 피드 (긴급 메모 제외) */}
+        <div className="px-4 pt-1 pb-2 flex flex-col gap-1.5">
         {recentNotes.filter(n => !n.is_emergency).length === 0 ? (
           <p className="text-center text-gray-700 text-xs py-6">첫 메모를 작성해보세요</p>
         ) : recentNotes.filter(n => !n.is_emergency).map(note => {
@@ -418,7 +421,8 @@ export default function HomePage() {
             </div>
           )
         })}
-      </div>
+        </div>{/* 메모 피드 끝 */}
+      </div>{/* 전체 스크롤 영역 끝 */}
 
       {/* 입력 영역 — 하단 고정 */}
       <main className="shrink-0 px-4 pb-4 pt-2 border-t border-[#1e1e2e]">
