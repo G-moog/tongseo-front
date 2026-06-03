@@ -68,6 +68,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
   }
 
+  // OAuth 리다이렉트 후 세션 확인 시 이메일 허용 여부 검사
+  useEffect(() => {
+    if (!session?.user?.email) return
+
+    const checkAllowed = async () => {
+      const { data, error } = await supabase.rpc('is_email_allowed', {
+        p_email: session.user.email,
+      })
+      if (error) return // 함수 오류 시 차단하지 않음 (안전 방향)
+      if (data === false) {
+        await supabase.auth.signOut()
+        window.location.href = '/login?error=not_allowed'
+      }
+    }
+
+    checkAllowed()
+  }, [session?.user?.email])
+
   const signOut = async () => {
     await supabase.auth.signOut()
     setSession(null)

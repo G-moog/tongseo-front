@@ -12,6 +12,8 @@ import SettingsPage from './pages/SettingsPage'
 import ClassifyReviewPage from './pages/ClassifyReviewPage'
 import RoutinesPage from './pages/RoutinesPage'
 import EmergencyTasksPage from './pages/EmergencyTasksPage'
+import AdminPage from './pages/AdminPage'
+import { AdminGuard } from './components/AdminGuard'
 
 function AppInner() {
   useFCM()
@@ -28,6 +30,7 @@ function AppInner() {
         <Route path="/classify-review" element={<RequireAuth><ClassifyReviewPage /></RequireAuth>} />
         <Route path="/routines" element={<RequireAuth><RoutinesPage /></RequireAuth>} />
         <Route path="/emergency" element={<RequireAuth><EmergencyTasksPage /></RequireAuth>} />
+        <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>

@@ -19,6 +19,7 @@ export interface UserProfile {
   id: string
   email: string
   nickname: string | null
+  role: string | null
   api_key: string | null
   default_manual_category: string | null
   trash_days: number

@@ -450,7 +450,15 @@ export default function SettingsPage() {
 
         {/* ── 앱 정보 */}
         <Section title="앱 정보">
-          <Row label="버전" right={<span className="text-xs text-gray-600">0.1.0</span>} border={false} />
+          <Row label="버전" right={<span className="text-xs text-gray-600">0.1.0</span>} border={profile?.role === 'admin'} />
+          {profile?.role === 'admin' && (
+            <Row
+              label="🔧 관리자 페이지"
+              onClick={() => navigate('/admin')}
+              right={<span className="text-xs text-gray-600">→</span>}
+              border={false}
+            />
+          )}
         </Section>
 
       </main>
