@@ -390,7 +390,7 @@ export default function HomePage() {
                     🚨
                   </button>
                   <button
-                    onClick={() => navigate('/edit', { state: { note } })}
+                    onClick={() => navigate('/edit', { state: { note, from: '/' } })}
                     className="p-1 text-gray-600 hover:text-violet-400 transition-colors text-xs"
                   >
                     ✏️

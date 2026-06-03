@@ -16,6 +16,7 @@ export default function EditNotePage() {
   const navigate = useNavigate()
   const location = useLocation()
   const note: Note = location.state?.note
+  const from: string = location.state?.from ?? '/notes'
 
   const { user, profile } = useAuth()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -113,7 +114,7 @@ export default function EditNotePage() {
         .update({ ...payload, updated_at: new Date().toISOString() })
         .eq('id', note.id)
       if (error) throw error
-      navigate('/notes', { replace: true })
+      navigate(from, { replace: true })
     } catch {
       setError('저장에 실패했습니다. 다시 시도해주세요.')
       setLoading(false)
@@ -221,7 +222,7 @@ export default function EditNotePage() {
     <div className="flex flex-col min-h-svh bg-[#111118]">
       {/* 헤더 */}
       <header className="flex items-center justify-between px-4 py-3 border-b border-[#2e2e42]">
-        <button onClick={() => navigate('/notes')}
+        <button onClick={() => navigate(from)}
           className="text-sm text-gray-500 hover:text-gray-300 transition-colors">
           ← 취소
         </button>
