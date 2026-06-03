@@ -39,11 +39,11 @@ function Row({
       onClick={onClick}
       className={`flex items-center justify-between px-4 py-3.5 ${border ? 'border-b border-[#2e2e42]' : ''} ${onClick ? 'cursor-pointer hover:bg-[#252535] transition-colors active:bg-[#2a2a3d]' : ''}`}
     >
-      <div className="flex flex-col gap-0.5">
+      <div className="flex flex-col gap-0.5 min-w-0 flex-1 pr-3">
         <span className={`text-sm font-medium ${danger ? 'text-red-400' : 'text-gray-200'}`}>{label}</span>
         {sublabel && <span className="text-xs text-gray-600">{sublabel}</span>}
       </div>
-      {right}
+      <div className="shrink-0">{right}</div>
     </div>
   )
 }
