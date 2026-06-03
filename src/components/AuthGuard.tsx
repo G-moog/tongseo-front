@@ -2,15 +2,26 @@ import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
+const ONBOARDING_SKIPPED_KEY = 'onboarding_skipped'
+
 export function RequireAuth({ children }: { children: ReactNode }) {
-  const { session, loading, hasApiKey } = useAuth()
+  const { session, loading, profile } = useAuth()
   const location = useLocation()
 
   if (loading) return <LoadingScreen />
   if (!session) return <Navigate to="/login" replace />
-  if (!hasApiKey && location.pathname !== '/setup-api-key') {
+
+  // 최초 로그인 + API 키 없음 + 온보딩 아직 안 본 경우 → 온보딩 화면
+  const onboardingSkipped = localStorage.getItem(ONBOARDING_SKIPPED_KEY) === 'true'
+  if (
+    profile !== null &&
+    profile.api_key === null &&
+    !onboardingSkipped &&
+    location.pathname !== '/setup-api-key'
+  ) {
     return <Navigate to="/setup-api-key" replace />
   }
+
   return <>{children}</>
 }
 

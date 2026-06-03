@@ -121,8 +121,16 @@ export default function SettingsPage() {
     setApiKeySaving(true)
     setApiKeyMsg('')
     const { error } = await supabase.functions.invoke('update-api-key', { body: { api_key: key } })
-    if (error) { setApiKeyMsg('저장 실패. 다시 시도해주세요.'); }
-    else { setApiKeyMsg('저장됐습니다 ✓'); setNewApiKey('') }
+    if (error) {
+      setApiKeyMsg('저장 실패. 다시 시도해주세요.')
+    } else {
+      // API 키 등록 성공 시 ai_classify_enabled 자동으로 true 전환
+      await supabase.from('users').update({ ai_classify_enabled: true }).eq('id', user!.id)
+      setAiClassifyEnabled(true)
+      setApiKeyMsg('저장됐습니다 ✓ (AI 분류 자동 활성화)')
+      setNewApiKey('')
+      await refreshProfile()
+    }
     setApiKeySaving(false)
   }
 
@@ -137,6 +145,11 @@ export default function SettingsPage() {
   // ── AI 자동분류 ON/OFF
   const saveAiClassify = async (val: boolean) => {
     if (!user) return
+    // ON으로 변경하려는데 API 키 없으면 안내
+    if (val && !profile?.api_key) {
+      setApiKeyMsg('먼저 API 키를 등록해주세요.')
+      return
+    }
     setAiClassifyEnabled(val)
     await supabase.from('users').update({ ai_classify_enabled: val }).eq('id', user.id)
     await refreshProfile()

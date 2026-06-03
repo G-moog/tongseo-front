@@ -51,6 +51,9 @@ export default function HomePage() {
   const [emergencyRefreshKey, setEmergencyRefreshKey] = useState(0)
   const [categories, setCategories] = useState<Category[]>([])
   const [recentNotes, setRecentNotes] = useState<Note[]>([])
+  const [bannerDismissed, setBannerDismissed] = useState(
+    sessionStorage.getItem('banner_dismissed') === 'true'
+  )
   const aiEnabled = profile?.ai_classify_enabled ?? true
 
   const [content, setContent] = useState('')
@@ -315,6 +318,35 @@ export default function HomePage() {
         </div>
         <div className="w-9" />
       </header>
+
+      {/* AI 분류 OFF 안내 배너 */}
+      {!aiEnabled && !bannerDismissed && (
+        <div className="mx-4 mt-2 mb-1 shrink-0 bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3 flex items-start justify-between gap-3">
+          <div className="flex gap-2 items-start flex-1">
+            <span className="text-amber-400 text-base shrink-0">💡</span>
+            <div className="flex flex-col gap-0.5">
+              <p className="text-xs text-amber-200 font-medium">현재 AI 분류가 꺼져 있어요.</p>
+              <p className="text-xs text-amber-400/70">
+                설정에서 Claude API 키를 등록하면 자동 분류를 사용할 수 있어요.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => navigate('/settings')}
+              className="text-[11px] font-semibold text-amber-400 hover:text-amber-300 transition-colors whitespace-nowrap"
+            >
+              설정 →
+            </button>
+            <button
+              onClick={() => { setBannerDismissed(true); sessionStorage.setItem('banner_dismissed', 'true') }}
+              className="text-gray-600 hover:text-gray-400 transition-colors text-xs"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Daily Routines 위젯 */}
       <DailyRoutinesWidget />
